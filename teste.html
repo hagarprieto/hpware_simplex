@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<textarea rows="15" cols="15" id="inputarea" style="display:none;"></textarea>
+<div class="alert alert-danger alert-dismissible fade show" id="solutionout">
+				An optimal solution (or message) will appear here.
+			</div>
+</body>
+	<script src = "simplex_js/LPdefs.js?"></script>
+	<script src = "simplex_js/LPmethods.js"></script>
+    <script src="assets/js/core/jquery.min.js"></script>
+
+	<script>
+		lp_reportErrorsTo=lp_reportSolutionTo="solutionout";
+		var lp_demo_exampleNumber=0;
+		var lp_demo_accuracy=6;
+		var lp_demo_mode="decimal";
+		var lp_demo_verboseLevel=lp_verbosity_none;
+		var exampleStr = [
+		"Maximize p = (1/2)x + 3y + z + 4w subject to \nx + y + z + w <= 40\n2x + y - z - w >= 10\nw - y >= 12"
+		,
+		"minimize z = 900x1 + 1400x2 + 700x3 + 1000x4 + 1700x5 + 900x6 subject to\nx1 + x2 + x3 <= 10\nx4 + x5 + x6 <= 10\nx1 + x4 >= 6\nx2 + x5 >= 4\nx3 + x6 >= 4\nx4 - x6 <= 0"
+		,
+		
+		"Maximize p = (1/2)x + 3y + z + 4w subject to \nx + y + z + w <= 40 \n2x + y - z - w >= 10 \nw - y >= 12 \ninteger w, x, y, z"
+		,
+		"Maximize p = x + 2y + 3z subject to \nx + y <= 20.5\ny + z <= 20.5\nx + z <= 30.5\ninteger x, y, z" ,
+		"Maximize p = x+y\nx+y<=.75\nx+y>=.5\ninteger x,y"]
+
+		function showExamples() {
+			document.getElementById("inputarea").value=exampleStr[lp_demo_exampleNumber%exampleStr.length];
+			lp_demo_exampleNumber++;
+		}
+
+		function clearAll() {
+			document.getElementById("inputarea").value="";
+			document.getElementById("solutionout").innerHTML="An optimal solution (or message) will appear here.";
+			
+		}
+
+		function clearOutput() {
+			
+		}
+		
+		function showOutput( str ) {
+			
+		}
+		
+		function showSolution( str ) {
+			document.getElementById("solutionout").innerHTML = str;
+			//alert(str);
+			//window.location.href = "http://pnae.nebin.com.br/index.php?ferramenta=13&id_dieta=6&solution="+str;
+		}
+
+		function adjustAccuracy() {
+			var inAcc=parseInt(6);
+			if ( (inAcc<=0)||(inAcc>13)||(isNaN(inAcc)) ) {
+				alert("Must be in integer in the range 0-13")
+				document.getElementById("accuracyDig").value=6;
+			}
+			else lp_demo_accuracy = inAcc;
+		}
+
+		function setMode() {
+			lp_demo_mode=parseInt(3); // ids are conveniently set to equal the mode
+		}
+
+		function setShowTabl() {
+			lp_demo_verboseLevel = lp_verbosity_none;
+		}
+	</script>
+    
+<script>
+var query = location.search.slice(1);
+var partes = query.split('?');
+
+var equacao='';
+partes.forEach(function (parte) {
+    var chaveValor = parte.split('equacao=');
+    var chave = chaveValor[0];
+    var valor = chaveValor[1];
+	var $conteudo = '';
+	
+	equacao=valor.replace(/%20/g, " ");
+	equacao=equacao.replace(/%3E/g, ">");
+	equacao=equacao.replace(/%3C/g, "<");
+	
+	
+	var linhas  = equacao.split('\\n');
+	
+	linhas.forEach(function (linha) {
+		
+		$conteudo= $conteudo + linha + '\n';
+	});
+	
+	$('#inputarea').val($conteudo);
+   
+	//equacao=equacao.replace(/"/g, "");
+	//equacao=equacao.replace(/\\n/g, "<br>");
+	
+	//document.getElementById("inputarea").value=equacao;
+	
+	
+	
+	clearOutput();
+	adjustAccuracy();
+	setMode();
+	setShowTabl();
+	var Q = new lpProblem( document.getElementById('inputarea').value );
+	lp_verboseLevel=lp_demo_verboseLevel;
+	Q.mode=lp_demo_mode;
+	Q.sigDigits=lp_demo_accuracy;
+	try{Q.solve()}
+	finally{showOutput( lp_trace_string );showSolution( Q.solutionToString() );}
+	
+});
+
+//console.log(data); 
+</script>
+
+</html>
